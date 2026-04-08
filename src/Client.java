@@ -1,27 +1,10 @@
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.awt.*;
+import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
+import javax.swing.*;
 
 public class Client {
 
@@ -37,8 +20,6 @@ public class Client {
     private static final Color OK = new Color(130, 220, 140);
 
     private final JFrame frame = new JFrame("einfacher chat client");
-    private final CardLayout cardLayout = new CardLayout();
-    private final JPanel cards = new JPanel(cardLayout);
 
     private final JTextField hostField = new JTextField(DEFAULT_HOST);
     private final JTextField portField = new JTextField(String.valueOf(DEFAULT_PORT));
@@ -55,6 +36,10 @@ public class Client {
     private final JTextArea chatArea = new JTextArea();
     private final JTextArea outputArea = new JTextArea();
 
+    private JPanel connectPanel;
+    private JPanel authPanel;
+    private JPanel mainPanel;
+
     private String loggedInUser = null;
     private String lastChatRender = "";
 
@@ -66,12 +51,9 @@ public class Client {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setBackground(BG);
 
-        cards.setBackground(BG);
-        cards.add(buildConnectPanel(), "connect");
-        cards.add(buildAuthPanel(), "auth");
-        cards.add(buildMainPanel(), "main");
+        connectPanel = buildConnectPanel();
+        authPanel = buildAuthPanel();
 
-        frame.add(cards);
         showConnect();
         frame.setVisible(true);
 
@@ -414,20 +396,41 @@ public class Client {
     }
 
     private void showConnect() {
-        cardLayout.show(cards, "connect");
-        frame.setSize(430, 250);
+        frame.setContentPane(connectPanel);
+        frame.setExtendedState(JFrame.NORMAL);
+        frame.setResizable(false);
+        Dimension small = new Dimension(430, 250);
+        frame.setMinimumSize(small);
+        frame.setMaximumSize(small);
+        frame.setSize(small);
+        frame.validate();
         frame.setLocationRelativeTo(null);
     }
 
     private void showAuth() {
-        cardLayout.show(cards, "auth");
-        frame.setSize(430, 270);
+        frame.setContentPane(authPanel);
+        frame.setExtendedState(JFrame.NORMAL);
+        frame.setResizable(false);
+        Dimension small = new Dimension(430, 270);
+        frame.setMinimumSize(small);
+        frame.setMaximumSize(small);
+        frame.setSize(small);
+        frame.validate();
         frame.setLocationRelativeTo(null);
     }
 
     private void showMain() {
-        cardLayout.show(cards, "main");
+        if (mainPanel == null) {
+            mainPanel = buildMainPanel();
+        }
+
+        frame.setContentPane(mainPanel);
+        frame.setExtendedState(JFrame.NORMAL);
+        frame.setResizable(true);
+        frame.setMinimumSize(new Dimension(900, 650));
+        frame.setMaximumSize(new Dimension(10000, 10000));
         frame.setSize(900, 650);
+        frame.validate();
         frame.setLocationRelativeTo(null);
         log("eingeloggt als " + loggedInUser);
     }
